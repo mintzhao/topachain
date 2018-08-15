@@ -1,5 +1,11 @@
-
-
-
 # logging section
 logging:
+
+# crypto section
+crypto:
+
+  # hash
+  hash: SHA256
+
+  # sign
+  sign: ECDSA

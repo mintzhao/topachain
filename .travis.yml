@@ -1,0 +1,12 @@
+language: go
+sudo: enabled
+go:
+  - "1.10.3"
+addons:
+  apt:
+    packages:
+      - curl
+notifications:
+  email: false
+services:
+  - docker

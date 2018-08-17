@@ -32,9 +32,9 @@ func (ts *testsigner) Verify(k crypto.PublicKey, signature, msg []byte, opts cry
 }
 
 func TestRegisterSigner(t *testing.T) {
-	assert.EqualError(t, RegisterSigner("RSA", &rsaSigner{}), (&ErrSignerAlreadyRegistered{}).Error())
-	assert.EqualError(t, RegisterSigner("RSA ", &rsaSigner{}), (&ErrSignerAlreadyRegistered{}).Error())
-	assert.EqualError(t, RegisterSigner(" rsa  ", &rsaSigner{}), (&ErrSignerAlreadyRegistered{}).Error())
+	assert.EqualError(t, RegisterSigner("RSA", &rsaSigner{}), (&ErrSignerAlreadyRegistered{signerName: "RSA"}).Error())
+	assert.EqualError(t, RegisterSigner("RSA ", &rsaSigner{}), (&ErrSignerAlreadyRegistered{signerName: "RSA "}).Error())
+	assert.EqualError(t, RegisterSigner(" rsa  ", &rsaSigner{}), (&ErrSignerAlreadyRegistered{signerName: " rsa  "}).Error())
 
 	tSigner := &testsigner{}
 	assert.NoError(t, RegisterSigner("test", tSigner))

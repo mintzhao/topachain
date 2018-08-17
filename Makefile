@@ -45,7 +45,6 @@ DOCKER_NS ?= mintzhao
 DOCKER_TAG=$(ARCH)-$(PROJECT_VERSION)
 
 PKGNAME = github.com/$(PROJECT_NAME)
-CGO_FLAGS = CGO_CFLAGS=" "
 ARCH=$(shell uname -m)
 MARCH=$(shell go env GOOS)-$(shell go env GOARCH)
 
@@ -54,10 +53,12 @@ METADATA_VAR = Version=$(PROJECT_VERSION)
 
 GOBIN=$(abspath $(GOPATH)/bin)
 GO_LDFLAGS = $(patsubst %,-X $(PKGNAME)/cmd/version.%,$(METADATA_VAR))
+CGO_FLAGS = CGO_CFLAGS=" "
 
 GO_TAGS ?=
 
 export GO_LDFLAGS
+export CGO_FLAGS
 
 # No sense rebuilding when non production code is changed
 PROJECT_FILES = $(shell git ls-files  | grep -v ^test | grep -v ^unit-test | \
@@ -79,24 +80,23 @@ dep.tools.golint := github.com/golang/lint/golint
 dep.tools.goimports := golang.org/x/tools/cmd/goimports
 dep.tools.misspell := github.com/client9/misspell/cmd/misspell
 
-all: native checks
+all: checks native
 
-checks: spelling linter test
+checks: spelling linter unit-test
 
 .PHONY: topa
 topa: build/bin/topa
 
 native: topa
 
-test:
-	@go test $(@go list ./... | @grep -v /vendor/)
+unit-test:
+	go list ./... | grep -v /vendor/ | xargs go test -tags "$(GO_TAGS)" -ldflags "$(GO_LDFLAGS)"
 
 build/bin/topa: $(PROJECT_FILES)
 	@mkdir -p $(@D)
 	@echo "$@"
-	$(CGO_FLAGS) go build -o $(@F) -tags "$(GO_TAGS)" -ldflags "$(GO_LDFLAGS)" $(pkgmap.$(@F))
+	$(CGO_FLAGS) go build -o $(@) -tags "$(GO_TAGS)" -ldflags "$(GO_LDFLAGS)" $(pkgmap.$(@F))
 	@echo "Binary available as $@"
-	@touch $@
 
 dep.tools.%:
 	$(eval TOOL = ${subst dep.tools.,,${@}})

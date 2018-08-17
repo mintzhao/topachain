@@ -11,3 +11,96 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 package signer
+
+import (
+	"bytes"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestEcdsaSigner_Sign(t *testing.T) {
+	signer := &ecdsaSigner{}
+
+	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	assert.Nil(t, err)
+	assert.NotNil(t, privKey)
+
+	msg := bytes.NewBufferString("this is a string used for test ecdsaSigner").Bytes()
+
+	// sign
+	sig, err := signer.Sign(privKey, msg, nil)
+	assert.Nil(t, err)
+	assert.NotNil(t, sig)
+
+	// verify ok
+	ok, err := signer.Verify(privKey.Public(), sig, msg, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, true, ok)
+
+	// verify not ok
+	notok, err := signer.Verify(privKey.Public(), sig[1:], msg, nil)
+	assert.NotNil(t, err)
+	assert.Equal(t, false, notok)
+}
+
+func TestEcdsaSigner_Verify(t *testing.T) {
+	signer := &ecdsaSigner{}
+
+	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	assert.Nil(t, err)
+	assert.NotNil(t, privKey)
+
+	msg := bytes.NewBufferString("this is a string used for test ecdsaSigner").Bytes()
+
+	// sign
+	sig, err := signer.Sign(privKey, msg, nil)
+	assert.Nil(t, err)
+	assert.NotNil(t, sig)
+
+	// verify ok
+	ok, err := signer.Verify(privKey.Public(), sig, msg, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, true, ok)
+
+	// verify not ok
+	notok, err := signer.Verify(privKey.Public(), sig, bytes.NewBufferString("this is another string").Bytes(), nil)
+	assert.Nil(t, err)
+	assert.Equal(t, false, notok)
+}
+
+func BenchmarkEcdsaSigner_Sign(b *testing.B) {
+	signer := &ecdsaSigner{}
+
+	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		b.FailNow()
+	}
+
+	msg := bytes.NewBufferString("this is a string used for ecdsa signer benchmark").Bytes()
+	for i := 0; i <= b.N; i++ {
+		signer.Sign(privKey, msg, nil)
+	}
+}
+
+func BenchmarkEcdsaSigner_Verify(b *testing.B) {
+	signer := &ecdsaSigner{}
+
+	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		b.FailNow()
+	}
+
+	msg := bytes.NewBufferString("this is a string used for ecdsa signer benchmark").Bytes()
+	sig, err := signer.Sign(privKey, msg, nil)
+	if err != nil {
+		b.FailNow()
+	}
+
+	for i := 0; i <= b.N; i++ {
+		signer.Verify(privKey.Public(), sig, msg, nil)
+	}
+}

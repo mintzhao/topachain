@@ -11,3 +11,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 package signer
+
+import (
+	"crypto"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+// used for test only
+type testsigner struct {
+}
+
+func (ts *testsigner) Sign(k crypto.PrivateKey, msg []byte, opts crypto.SignerOpts) ([]byte, error) {
+	return nil, nil
+}
+
+func (ts *testsigner) Verify(k crypto.PublicKey, signature, msg []byte, opts crypto.SignerOpts) (bool, error) {
+	return false, nil
+}
+
+func TestRegisterSigner(t *testing.T) {
+	assert.EqualError(t, RegisterSigner("RSA", &rsaSigner{}), (&ErrSignerAlreadyRegistered{}).Error())
+	assert.EqualError(t, RegisterSigner("RSA ", &rsaSigner{}), (&ErrSignerAlreadyRegistered{}).Error())
+	assert.EqualError(t, RegisterSigner(" rsa  ", &rsaSigner{}), (&ErrSignerAlreadyRegistered{}).Error())
+
+	tSigner := &testsigner{}
+	assert.NoError(t, RegisterSigner("test", tSigner))
+	retSigner, err := GetSigner("Test")
+	assert.NoError(t, err)
+	assert.Equal(t, tSigner, retSigner)
+
+	// delete test signer
+	DeRegisterSigner("test")
+}
+
+func TestGetSigner(t *testing.T) {
+	_, err := GetSigner("Test")
+	assert.EqualError(t, err, (&ErrSignerNotFound{signerName: "Test"}).Error())
+
+	tSigner := &testsigner{}
+	assert.NoError(t, RegisterSigner("test", tSigner))
+	retSigner, err := GetSigner(" test ")
+	assert.NoError(t, err)
+	assert.Equal(t, tSigner, retSigner)
+
+	// delete test signer
+	DeRegisterSigner("test")
+
+	_, err = GetSigner("rsa")
+	assert.NoError(t, err)
+}

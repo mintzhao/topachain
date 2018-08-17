@@ -16,13 +16,13 @@ import "github.com/spf13/viper"
 
 // GetHasherName returns customize hash function, default is SHA256
 func GetHasherName() string {
-	hashName := viper.GetString("crypto.hash")
+	hasherName := viper.GetString("crypto.hash")
 
-	if hashName == "" {
-		hashName = "SHA256"
+	if hasherName == "" {
+		hasherName = "SHA256"
 	}
 
-	return hashName
+	return hasherName
 }
 
 // GetSignerName returns customize signer, default is ECDSA

@@ -11,3 +11,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 package hasher
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestRegisterHasher(t *testing.T) {
+	assert.EqualError(t, RegisterHasher("SHA256", &sha256Hasher{}), (&ErrHasherAlreadyRegistered{hasherName: "SHA256"}).Error())
+	assert.NoError(t, RegisterHasher("test", &sha256Hasher{}))
+
+	_, err := GetHasher("test")
+	assert.NoError(t, err)
+
+	DeRegisterHasher("test")
+}
+
+func TestGetHasher(t *testing.T) {
+	_, err := GetHasher("test")
+	assert.EqualError(t, err, (&ErrHasherNotFound{"test"}).Error())
+
+	_, err = GetHasher("sha256")
+	assert.NoError(t, err)
+}

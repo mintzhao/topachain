@@ -33,21 +33,22 @@ func init() {
 	// register default signers
 	RegisterSigner("RSA", &rsaSigner{})
 	RegisterSigner("ECDSA", &ecdsaSigner{})
+	RegisterSigner("ED25519", &ed25519Signer{})
 }
 
 // Signer contains signing functions
 type Signer interface {
 
-	// Sign signs digest using PrivateKey k.
-	Sign(k crypto.PrivateKey, digest []byte, opts crypto.SignerOpts) ([]byte, error)
+	// Sign signs msg using PrivateKey k.
+	Sign(k crypto.PrivateKey, msg []byte, opts crypto.SignerOpts) ([]byte, error)
 
 	// Verify verifies signature against key k and digest
-	//Verify(k crypto.PublicKey, signature, digest []byte) (bool, error)
+	Verify(k crypto.PublicKey, signature, msg []byte, opts crypto.SignerOpts) (bool, error)
 }
 
 // RegisterSigner stores signer into signers, if signerName is already registered, return error
 func RegisterSigner(signerName string, s Signer) error {
-	_, loaded := signers.LoadOrStore(strings.ToUpper(signerName), s)
+	_, loaded := signers.LoadOrStore(signerNameFmt(signerName), s)
 	if loaded {
 		// already registered
 		logger.Warningf("signer %s already registered", signerName)
@@ -58,9 +59,14 @@ func RegisterSigner(signerName string, s Signer) error {
 	return nil
 }
 
+// DeRegisterSigner delete signer from signers, SHOULD ONLY USED IN TEST
+func DeRegisterSigner(signerName string) {
+	signers.Delete(signerNameFmt(signerName))
+}
+
 // GetHash return a hash function that already registered in hashes, if not return error
 func GetSigner(signerName string) (Signer, error) {
-	signer, ok := signers.Load(strings.ToUpper(signerName))
+	signer, ok := signers.Load(signerNameFmt(signerName))
 	if !ok {
 		// not found
 		logger.Warningf("signer %s not found", signerName)
@@ -70,6 +76,10 @@ func GetSigner(signerName string) (Signer, error) {
 	return signer.(Signer), nil
 }
 
+func signerNameFmt(signerName string) string {
+	return strings.ToUpper(strings.TrimSpace(signerName))
+}
+
 // ErrSignerAlreadyRegistered indicated a signer already registered in to signers
 type ErrSignerAlreadyRegistered struct {
 	signerName string
@@ -77,7 +87,7 @@ type ErrSignerAlreadyRegistered struct {
 
 // Error output error message
 func (err *ErrSignerAlreadyRegistered) Error() string {
-	return fmt.Sprintf("signer %s has already registered", err.signerName)
+	return fmt.Sprintf("Signer %s has already registered.", err.signerName)
 }
 
 // ErrSignerNotFound indicated a signer can not found in signers
@@ -87,5 +97,34 @@ type ErrSignerNotFound struct {
 
 // Error output error message
 func (err *ErrSignerNotFound) Error() string {
-	return fmt.Sprintf("signer %s not found", err.signerName)
+	return fmt.Sprintf("Signer %s not found.", err.signerName)
+}
+
+// ErrNilSignerOptions indicated a nil signer options
+type ErrNilSignerOptions struct {
+}
+
+// Error output error message
+func (err *ErrNilSignerOptions) Error() string {
+	return fmt.Sprint("Invalid options. It must not be nil.")
+}
+
+// ErrInvalidSignerOptions indicated invalid signer options
+type ErrInvalidSignerOptions struct {
+	opts crypto.SignerOpts
+}
+
+// Error output error message
+func (err *ErrInvalidSignerOptions) Error() string {
+	return fmt.Sprintf("Invalid options: %s.", err.opts)
+}
+
+// ErrUnmarshalSignature indicated unmarshal signature occur error
+type ErrUnmarshalSignature struct {
+	e error
+}
+
+// Error output error message
+func (err *ErrUnmarshalSignature) Error() string {
+	return fmt.Sprintf("Failed unmashalling signature: %s", err.e)
 }

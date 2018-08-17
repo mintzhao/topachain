@@ -16,12 +16,34 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/rand"
+	"encoding/asn1"
+	"math/big"
 )
 
 type ecdsaSigner struct {
 }
 
+type ecdsaSignature struct {
+	R, S *big.Int
+}
+
 // Sign signs digest using PrivateKey k.
 func (es *ecdsaSigner) Sign(k crypto.PrivateKey, digest []byte, opts crypto.SignerOpts) ([]byte, error) {
-	return k.(*ecdsa.PrivateKey).Sign(rand.Reader, digest, opts)
+	r, s, err := ecdsa.Sign(rand.Reader, k.(*ecdsa.PrivateKey), digest)
+	if err != nil {
+		return nil, err
+	}
+
+	return asn1.Marshal(ecdsaSignature{r, s})
+}
+
+// Verify verifies signature against key k and digest
+func (es *ecdsaSigner) Verify(k crypto.PublicKey, signature, digest []byte, opts crypto.SignerOpts) (bool, error) {
+	sig := new(ecdsaSignature)
+	_, err := asn1.Unmarshal(signature, sig)
+	if err != nil {
+		return false, &ErrUnmarshalSignature{e: err}
+	}
+
+	return ecdsa.Verify(k.(*ecdsa.PublicKey), digest, sig.R, sig.S), nil
 }

@@ -22,11 +22,43 @@ type rsaSigner struct {
 }
 
 // Sign signs digest using PrivateKey k.
-func (rs *rsaSigner) Sign(k crypto.PrivateKey, digest []byte, opts crypto.SignerOpts) ([]byte, error) {
+func (rs *rsaSigner) Sign(k crypto.PrivateKey, msg []byte, opts crypto.SignerOpts) ([]byte, error) {
+	if opts == nil {
+		return nil, &ErrNilSignerOptions{}
+	}
+
+	var digest []byte
+	switch opts.(type) {
+	case *rsa.PSSOptions:
+		h := opts.HashFunc().New()
+		h.Write(msg)
+		digest = h.Sum(nil)
+	default:
+		return nil, &ErrInvalidSignerOptions{}
+	}
+
 	return k.(*rsa.PrivateKey).Sign(rand.Reader, digest, opts)
 }
 
 // Verify verifies signature against key k and digest
-func (rs *rsaSigner) Verify(k crypto.PublicKey, signature, digest []byte) (bool, error) {
-	return false, nil
+func (rs *rsaSigner) Verify(k crypto.PublicKey, signature, msg []byte, opts crypto.SignerOpts) (bool, error) {
+	if opts == nil {
+		return false, &ErrNilSignerOptions{}
+	}
+
+	switch opts.(type) {
+	case *rsa.PSSOptions:
+		var digest []byte
+		h := opts.HashFunc().New()
+		h.Write(msg)
+		digest = h.Sum(nil)
+
+		err := rsa.VerifyPSS(k.(*rsa.PublicKey),
+			(opts.(*rsa.PSSOptions)).Hash,
+			digest, signature, opts.(*rsa.PSSOptions))
+
+		return err == nil, err
+	}
+
+	return false, &ErrInvalidSignerOptions{opts: opts}
 }

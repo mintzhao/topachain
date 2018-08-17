@@ -50,46 +50,55 @@ type Hasher interface {
 }
 
 // RegisterHasher stores hash function into hashes, if hashName is already registered, return error
-func RegisterHasher(hashName string, hasher Hasher) error {
-	_, loaded := hashes.LoadOrStore(strings.ToUpper(hashName), f)
+func RegisterHasher(hasherName string, hasher Hasher) error {
+	_, loaded := hashes.LoadOrStore(hasherNameFmt(hasherName), hasher)
 	if loaded {
 		// already registered
-		logger.Warningf("hasher %s already registered", hashName)
-		return &ErrHashAlreadyRegistered{hashName: hashName}
+		logger.Warningf("hasher %s already registered", hasherName)
+		return &ErrHasherAlreadyRegistered{hasherName: hasherName}
 	}
 
-	logger.Infof("hasher %s registered", hashName)
+	logger.Infof("hasher %s registered", hasherName)
 	return nil
 }
 
+// DeRegisterHasher delete hasher form hashes, SHOULD ONLY USED IN TEST
+func DeRegisterHasher(hasherName string) {
+	hashes.Delete(hasherNameFmt(hasherName))
+}
+
 // GetHasher return a hash function that already registered in hashes, if not return error
-func GetHasher(hashName string) (Hasher, error) {
-	f, ok := hashes.Load(strings.ToUpper(hashName))
+func GetHasher(hasherName string) (Hasher, error) {
+	f, ok := hashes.Load(hasherNameFmt(hasherName))
 	if !ok {
 		// not found
-		logger.Warningf("hasher %s not found", hashName)
-		return nil, &ErrHashNotFound{hashName: hashName}
+		logger.Warningf("hasher %s not found", hasherName)
+		return nil, &ErrHasherNotFound{hasherName: hasherName}
 	}
 
 	return f.(Hasher), nil
 }
 
-// ErrHashAlreadyRegistered indicated a hash function already registered in to hashes
-type ErrHashAlreadyRegistered struct {
-	hashName string
+func hasherNameFmt(hasherName string) string {
+	return strings.ToUpper(strings.TrimSpace(hasherName))
+}
+
+// ErrHasherAlreadyRegistered indicated a hash function already registered in to hashes
+type ErrHasherAlreadyRegistered struct {
+	hasherName string
 }
 
 // Error output error message
-func (err *ErrHashAlreadyRegistered) Error() string {
-	return fmt.Sprintf("hash %s has already registered", err.hashName)
+func (err *ErrHasherAlreadyRegistered) Error() string {
+	return fmt.Sprintf("hasher %s has already registered", err.hasherName)
 }
 
 // ErrHashNotFound indicated a hash function can not found in hashes
-type ErrHashNotFound struct {
-	hashName string
+type ErrHasherNotFound struct {
+	hasherName string
 }
 
 // Error output error message
-func (err *ErrHashNotFound) Error() string {
-	return fmt.Sprintf("hash %s not found", err.hashName)
+func (err *ErrHasherNotFound) Error() string {
+	return fmt.Sprintf("hasher %s not found", err.hasherName)
 }

@@ -11,3 +11,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 package hasher
+
+import (
+	"bytes"
+	"encoding/hex"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestSha256Hasher_Hash(t *testing.T) {
+	msg := bytes.NewBufferString("this is used for sha256 test").Bytes()
+	digest := "069c725da1725e638c8f1d901d4c4245d8b68cf571bbe445cb7be8709e5b59a2"
+
+	rethash, err := (&sha256Hasher{}).Hash(msg)
+	assert.NoError(t, err)
+
+	t.Logf("ret hash %x", rethash)
+
+	assert.EqualValues(t, digest, hex.EncodeToString(rethash))
+}
+
+func BenchmarkSha256Hasher_Hash(b *testing.B) {
+	msg := bytes.NewBufferString("this is used for sha256 test").Bytes()
+	hasher := &sha256Hasher{}
+
+	for i := 0; i < b.N; i++ {
+		hasher.Hash(msg)
+	}
+}

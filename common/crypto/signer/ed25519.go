@@ -11,3 +11,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 package signer
+
+import (
+	"crypto"
+
+	"golang.org/x/crypto/ed25519"
+)
+
+type ed25519Signer struct {
+}
+
+// Sign signs digest using PrivateKey k.
+func (es *ed25519Signer) Sign(k crypto.PrivateKey, digest []byte, opts crypto.SignerOpts) ([]byte, error) {
+	return ed25519.Sign(k.(ed25519.PrivateKey), digest), nil
+}
+
+// Verify verifies signature against key k and digest
+func (es *ed25519Signer) Verify(k crypto.PublicKey, signature, digest []byte, opts crypto.SignerOpts) (bool, error) {
+	return ed25519.Verify(k.(ed25519.PublicKey), digest, signature), nil
+}

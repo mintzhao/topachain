@@ -75,23 +75,42 @@ func (impl *cryptoImpl) Hash(msg []byte) ([]byte, error) {
 	return impl.her.Hash(msg)
 }
 
-// Sign is a global function to signs digest using PrivateKey k.
-func Sign(k crypto.PrivateKey, digest []byte, opts crypto.SignerOpts, signerName ...string) ([]byte, error) {
+// Sign is a global function to signs msg using PrivateKey k.
+func Sign(k crypto.PrivateKey, msg []byte, opts crypto.SignerOpts, signerName ...string) ([]byte, error) {
 	if len(signerName) != 0 {
 		sger, err := signer.GetSigner(signerName[0])
 		if err != nil {
 			return nil, err
 		}
 
-		return sger.Sign(k, digest, opts)
+		return sger.Sign(k, msg, opts)
 	}
 
-	return getInstance().Sign(k, digest, opts)
+	return getInstance().Sign(k, msg, opts)
 }
 
 // Sign signs digest using PrivateKey k.
-func (impl *cryptoImpl) Sign(k crypto.PrivateKey, digest []byte, opts crypto.SignerOpts) ([]byte, error) {
-	return impl.sger.Sign(k, digest, opts)
+func (impl *cryptoImpl) Sign(k crypto.PrivateKey, msg []byte, opts crypto.SignerOpts) ([]byte, error) {
+	return impl.sger.Sign(k, msg, opts)
+}
+
+// Verify is a global function to verify signature
+func Verify(k crypto.PublicKey, signature, msg []byte, opts crypto.SignerOpts, signerName ...string) (bool, error) {
+	if len(signerName) != 0 {
+		sger, err := signer.GetSigner(signerName[0])
+		if err != nil {
+			return false, err
+		}
+
+		return sger.Verify(k, signature, msg, opts)
+	}
+
+	return getInstance().Verify(k, signature, msg, opts)
+}
+
+// Verify verifies signature against key k and digest
+func (impl *cryptoImpl) Verify(k crypto.PublicKey, signature, msg []byte, opts crypto.SignerOpts) (bool, error) {
+	return impl.sger.Verify(k, signature, msg, opts)
 }
 
 var (

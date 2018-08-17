@@ -11,3 +11,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 package hasher
+
+import (
+	"bytes"
+	"encoding/hex"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestMd5Hasher_Hash(t *testing.T) {
+	msg := bytes.NewBufferString("this is used for md5 test").Bytes()
+	// MD5 ("this is used for md5 test") = 14c4063d61bd57528837784838ea5a79
+	digest := "14c4063d61bd57528837784838ea5a79"
+
+	rethash, err := (&md5Hasher{}).Hash(msg)
+	assert.NoError(t, err)
+
+	t.Logf("ret hash %x", rethash)
+
+	assert.EqualValues(t, digest, hex.EncodeToString(rethash))
+}
+
+func BenchmarkMd5Hasher_Hash(b *testing.B) {
+	msg := bytes.NewBufferString("this is used for md5 test").Bytes()
+	hasher := &md5Hasher{}
+
+	for i := 0; i < b.N; i++ {
+		hasher.Hash(msg)
+	}
+}

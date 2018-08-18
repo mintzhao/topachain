@@ -82,7 +82,7 @@ dep.tools.misspell := github.com/client9/misspell/cmd/misspell
 
 all: checks native
 
-checks: spelling linter unit-test
+checks: spelling linter unit-test unit-bench
 
 .PHONY: topa
 topa: build/bin/topa
@@ -90,7 +90,10 @@ topa: build/bin/topa
 native: topa
 
 unit-test:
-	go list ./... | grep -v /vendor/ | xargs go test -tags "$(GO_TAGS)" -ldflags "$(GO_LDFLAGS)"
+	go test -tags "$(GO_TAGS)" -ldflags "$(GO_LDFLAGS)" -failfast ./...
+
+unit-bench:
+	go test -tags "$(GO_TAGS)" -ldflags "$(GO_LDFLAGS)" -failfast -benchmem -bench=. ./...
 
 build/bin/topa: $(PROJECT_FILES)
 	@mkdir -p $(@D)

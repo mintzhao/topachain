@@ -31,8 +31,8 @@ var (
 
 func init() {
 	// register default hash func
-	RegisterHasher("MD5", &md5Hasher{})
-	RegisterHasher("SHA256", &sha256Hasher{})
+	RegisterHasher("MD5", &MD5Hasher{})
+	RegisterHasher("SHA256", &SHA256Hasher{})
 }
 
 // hash hashes messages msg using hf

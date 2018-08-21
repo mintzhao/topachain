@@ -14,9 +14,9 @@ package hasher
 
 import "crypto/md5"
 
-type md5Hasher struct {
+type MD5Hasher struct {
 }
 
-func (h *md5Hasher) Hash(msg []byte) ([]byte, error) {
+func (h *MD5Hasher) Hash(msg []byte) ([]byte, error) {
 	return hash(md5.New(), msg)
 }

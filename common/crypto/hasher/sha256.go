@@ -14,9 +14,9 @@ package hasher
 
 import "crypto/sha256"
 
-type sha256Hasher struct {
+type SHA256Hasher struct {
 }
 
-func (h *sha256Hasher) Hash(msg []byte) ([]byte, error) {
+func (h *SHA256Hasher) Hash(msg []byte) ([]byte, error) {
 	return hash(sha256.New(), msg)
 }

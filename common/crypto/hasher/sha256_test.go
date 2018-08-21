@@ -24,7 +24,7 @@ func TestSha256Hasher_Hash(t *testing.T) {
 	msg := bytes.NewBufferString("this is used for sha256 test").Bytes()
 	digest := "069c725da1725e638c8f1d901d4c4245d8b68cf571bbe445cb7be8709e5b59a2"
 
-	rethash, err := (&sha256Hasher{}).Hash(msg)
+	rethash, err := (&SHA256Hasher{}).Hash(msg)
 	assert.NoError(t, err)
 
 	t.Logf("ret hash %x", rethash)
@@ -34,7 +34,7 @@ func TestSha256Hasher_Hash(t *testing.T) {
 
 func BenchmarkSha256Hasher_Hash(b *testing.B) {
 	msg := bytes.NewBufferString("this is used for sha256 test").Bytes()
-	hasher := &sha256Hasher{}
+	hasher := &SHA256Hasher{}
 
 	for i := 0; i < b.N; i++ {
 		hasher.Hash(msg)

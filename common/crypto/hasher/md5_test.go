@@ -25,7 +25,7 @@ func TestMd5Hasher_Hash(t *testing.T) {
 	// MD5 ("this is used for md5 test") = 14c4063d61bd57528837784838ea5a79
 	digest := "14c4063d61bd57528837784838ea5a79"
 
-	rethash, err := (&md5Hasher{}).Hash(msg)
+	rethash, err := (&MD5Hasher{}).Hash(msg)
 	assert.NoError(t, err)
 
 	t.Logf("ret hash %x", rethash)
@@ -35,7 +35,7 @@ func TestMd5Hasher_Hash(t *testing.T) {
 
 func BenchmarkMd5Hasher_Hash(b *testing.B) {
 	msg := bytes.NewBufferString("this is used for md5 test").Bytes()
-	hasher := &md5Hasher{}
+	hasher := &MD5Hasher{}
 
 	for i := 0; i < b.N; i++ {
 		hasher.Hash(msg)

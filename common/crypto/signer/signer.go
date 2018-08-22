@@ -14,11 +14,11 @@ package signer
 
 import (
 	"crypto"
-	"fmt"
 	"strings"
 	"sync"
 
 	"github.com/op/go-logging"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -52,7 +52,7 @@ func RegisterSigner(signerName string, s Signer) error {
 	if loaded {
 		// already registered
 		logger.Warningf("signer %s already registered", signerName)
-		return &ErrSignerAlreadyRegistered{signerName: signerName}
+		return ErrSignerAlreadyRegistered
 	}
 
 	logger.Infof("signer %s registered", signerName)
@@ -70,7 +70,7 @@ func GetSigner(signerName string) (Signer, error) {
 	if !ok {
 		// not found
 		logger.Warningf("signer %s not found", signerName)
-		return nil, &ErrSignerNotFound{signerName: signerName}
+		return nil, ErrSignerNotFound
 	}
 
 	return signer.(Signer), nil
@@ -80,51 +80,16 @@ func signerNameFmt(signerName string) string {
 	return strings.ToUpper(strings.TrimSpace(signerName))
 }
 
-// ErrSignerAlreadyRegistered indicated a signer already registered in to signers
-type ErrSignerAlreadyRegistered struct {
-	signerName string
-}
+var (
+	// ErrSignerAlreadyRegistered indicated a signer already registered in to signers
+	ErrSignerAlreadyRegistered = errors.New("signer already registered")
 
-// Error output error message
-func (err *ErrSignerAlreadyRegistered) Error() string {
-	return fmt.Sprintf("Signer %s has already registered.", err.signerName)
-}
+	// ErrSignerNotFound indicated a signer can not found in signers
+	ErrSignerNotFound = errors.New("signer not found")
 
-// ErrSignerNotFound indicated a signer can not found in signers
-type ErrSignerNotFound struct {
-	signerName string
-}
+	// ErrNilSignerOptions indicated a nil signer options
+	ErrNilSignerOptions = errors.New("invalid options, it must not be nil")
 
-// Error output error message
-func (err *ErrSignerNotFound) Error() string {
-	return fmt.Sprintf("Signer %s not found.", err.signerName)
-}
-
-// ErrNilSignerOptions indicated a nil signer options
-type ErrNilSignerOptions struct {
-}
-
-// Error output error message
-func (err *ErrNilSignerOptions) Error() string {
-	return fmt.Sprint("Invalid options. It must not be nil.")
-}
-
-// ErrInvalidSignerOptions indicated invalid signer options
-type ErrInvalidSignerOptions struct {
-	opts crypto.SignerOpts
-}
-
-// Error output error message
-func (err *ErrInvalidSignerOptions) Error() string {
-	return fmt.Sprintf("Invalid options: %s.", err.opts)
-}
-
-// ErrUnmarshalSignature indicated unmarshal signature occur error
-type ErrUnmarshalSignature struct {
-	e error
-}
-
-// Error output error message
-func (err *ErrUnmarshalSignature) Error() string {
-	return fmt.Sprintf("Failed unmashalling signature: %s", err.e)
-}
+	// ErrInvalidSignerOptions indicated invalid signer options
+	ErrInvalidSignerOptions = errors.New("invalid options")
+)

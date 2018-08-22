@@ -18,6 +18,8 @@ import (
 	"crypto/rand"
 	"encoding/asn1"
 	"math/big"
+
+	"github.com/pkg/errors"
 )
 
 type ecdsaSigner struct {
@@ -42,7 +44,7 @@ func (es *ecdsaSigner) Verify(k crypto.PublicKey, signature, digest []byte, opts
 	sig := new(ecdsaSignature)
 	_, err := asn1.Unmarshal(signature, sig)
 	if err != nil {
-		return false, &ErrUnmarshalSignature{e: err}
+		return false, errors.Wrap(err, "unmarshal ecdsa signature error")
 	}
 
 	return ecdsa.Verify(k.(*ecdsa.PublicKey), digest, sig.R, sig.S), nil

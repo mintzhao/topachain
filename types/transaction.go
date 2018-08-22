@@ -10,28 +10,33 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package config
+package types
 
-import "github.com/spf13/viper"
+import (
+	"bytes"
+	"encoding/gob"
 
-// GetHasherName returns customize hash function, default is SHA256
-func GetHasherName() string {
-	hasherName := viper.GetString("crypto.hash")
+	"github.com/mintzhao/topachain/common/crypto"
+)
 
-	if hasherName == "" {
-		hasherName = "SHA256"
-	}
-
-	return hasherName
+// Transaction
+type Transaction struct {
+	Payload []byte // The data came from Blockchain Application, it's transparent to the ToPa Chain.
 }
 
-// GetSignerName returns customize signer, default is ECDSA
-func GetSignerName() string {
-	signerName := viper.GetString("crypto.sign")
+func (tx *Transaction) Hash() ([]byte, error) {
+	return crypto.Hash(tx.Payload)
+}
 
-	if signerName == "" {
-		signerName = "ECDSA"
+func (tx *Transaction) Equals(other interface{}) bool {
+	othertx, ok := other.(*Transaction)
+	if !ok {
+		return false
 	}
 
-	return signerName
+	return bytes.Equal(tx.Payload, othertx.Payload)
+}
+
+func init() {
+	gob.Register(Transaction{})
 }

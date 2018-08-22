@@ -16,10 +16,10 @@ import (
 	"crypto"
 	"sync"
 
-	"github.com/mintzhao/topachain/common/config"
 	"github.com/mintzhao/topachain/common/crypto/hasher"
 	"github.com/mintzhao/topachain/common/crypto/signer"
 	"github.com/op/go-logging"
+	"github.com/spf13/viper"
 )
 
 var logger = logging.MustGetLogger("crypto")
@@ -38,13 +38,13 @@ type cryptoImpl struct {
 
 // NewCrypto return a CryptoInterface instance based on configuration
 func NewCrypto() (CryptoInterface, error) {
-	hashName := config.GetHasherName()
+	hashName := getHasherName()
 	her, err := hasher.GetHasher(hashName)
 	if err != nil {
 		return nil, err
 	}
 
-	signerName := config.GetSignerName()
+	signerName := getSignerName()
 	sger, err := signer.GetSigner(signerName)
 	if err != nil {
 		return nil, err
@@ -128,4 +128,26 @@ func getInstance() CryptoInterface {
 	})
 
 	return instance
+}
+
+// getHasherName returns customize hash function, default is SHA256
+func getHasherName() string {
+	hasherName := viper.GetString("common.crypto.hash")
+
+	if hasherName == "" {
+		hasherName = "SHA256"
+	}
+
+	return hasherName
+}
+
+// getSignerName returns customize signer, default is ECDSA
+func getSignerName() string {
+	signerName := viper.GetString("common.crypto.sign")
+
+	if signerName == "" {
+		signerName = "ECDSA"
+	}
+
+	return signerName
 }

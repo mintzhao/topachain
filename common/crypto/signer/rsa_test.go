@@ -38,7 +38,7 @@ func TestRsaSigner_Sign(t *testing.T) {
 
 	// sign error
 	_, err = signer.Sign(privKey, msg, nil)
-	assert.EqualError(t, err, (&ErrNilSignerOptions{}).Error())
+	assert.EqualError(t, err, ErrNilSignerOptions.Error())
 
 	// sign
 	sig, err := signer.Sign(privKey, msg, opts)
@@ -47,7 +47,7 @@ func TestRsaSigner_Sign(t *testing.T) {
 
 	// verify
 	_, err = signer.Verify(privKey.Public(), sig, msg, nil)
-	assert.EqualError(t, err, (&ErrNilSignerOptions{}).Error())
+	assert.EqualError(t, err, ErrNilSignerOptions.Error())
 
 	// verify
 	ok, err := signer.Verify(privKey.Public(), sig, msg, opts)

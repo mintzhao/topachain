@@ -24,7 +24,7 @@ type rsaSigner struct {
 // Sign signs digest using PrivateKey k.
 func (rs *rsaSigner) Sign(k crypto.PrivateKey, msg []byte, opts crypto.SignerOpts) ([]byte, error) {
 	if opts == nil {
-		return nil, &ErrNilSignerOptions{}
+		return nil, ErrNilSignerOptions
 	}
 
 	var digest []byte
@@ -34,7 +34,7 @@ func (rs *rsaSigner) Sign(k crypto.PrivateKey, msg []byte, opts crypto.SignerOpt
 		h.Write(msg)
 		digest = h.Sum(nil)
 	default:
-		return nil, &ErrInvalidSignerOptions{}
+		return nil, ErrInvalidSignerOptions
 	}
 
 	return k.(*rsa.PrivateKey).Sign(rand.Reader, digest, opts)
@@ -43,7 +43,7 @@ func (rs *rsaSigner) Sign(k crypto.PrivateKey, msg []byte, opts crypto.SignerOpt
 // Verify verifies signature against key k and digest
 func (rs *rsaSigner) Verify(k crypto.PublicKey, signature, msg []byte, opts crypto.SignerOpts) (bool, error) {
 	if opts == nil {
-		return false, &ErrNilSignerOptions{}
+		return false, ErrNilSignerOptions
 	}
 
 	switch opts.(type) {
@@ -60,5 +60,5 @@ func (rs *rsaSigner) Verify(k crypto.PublicKey, signature, msg []byte, opts cryp
 		return err == nil, err
 	}
 
-	return false, &ErrInvalidSignerOptions{opts: opts}
+	return false, ErrInvalidSignerOptions
 }

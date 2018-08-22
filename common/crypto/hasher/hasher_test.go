@@ -19,7 +19,7 @@ import (
 )
 
 func TestRegisterHasher(t *testing.T) {
-	assert.EqualError(t, RegisterHasher("SHA256", &SHA256Hasher{}), (&ErrHasherAlreadyRegistered{hasherName: "SHA256"}).Error())
+	assert.EqualError(t, RegisterHasher("SHA256", &SHA256Hasher{}), ErrHasherAlreadyRegistered.Error())
 	assert.NoError(t, RegisterHasher("test", &SHA256Hasher{}))
 
 	_, err := GetHasher("test")
@@ -30,7 +30,7 @@ func TestRegisterHasher(t *testing.T) {
 
 func TestGetHasher(t *testing.T) {
 	_, err := GetHasher("test")
-	assert.EqualError(t, err, (&ErrHasherNotFound{"test"}).Error())
+	assert.EqualError(t, err, ErrHasherNotFound.Error())
 
 	_, err = GetHasher("sha256")
 	assert.NoError(t, err)

@@ -13,12 +13,12 @@
 package hasher
 
 import (
-	"fmt"
 	hash2 "hash"
 	"strings"
 	"sync"
 
 	"github.com/op/go-logging"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -55,7 +55,7 @@ func RegisterHasher(hasherName string, hasher Hasher) error {
 	if loaded {
 		// already registered
 		logger.Warningf("hasher %s already registered", hasherName)
-		return &ErrHasherAlreadyRegistered{hasherName: hasherName}
+		return ErrHasherAlreadyRegistered
 	}
 
 	logger.Infof("hasher %s registered", hasherName)
@@ -73,7 +73,7 @@ func GetHasher(hasherName string) (Hasher, error) {
 	if !ok {
 		// not found
 		logger.Warningf("hasher %s not found", hasherName)
-		return nil, &ErrHasherNotFound{hasherName: hasherName}
+		return nil, ErrHasherNotFound
 	}
 
 	return f.(Hasher), nil
@@ -83,22 +83,10 @@ func hasherNameFmt(hasherName string) string {
 	return strings.ToUpper(strings.TrimSpace(hasherName))
 }
 
-// ErrHasherAlreadyRegistered indicated a hash function already registered in to hashes
-type ErrHasherAlreadyRegistered struct {
-	hasherName string
-}
+var (
+	// ErrHasherNotFound is returned when hasher not found
+	ErrHasherNotFound = errors.New("hasher not found")
 
-// Error output error message
-func (err *ErrHasherAlreadyRegistered) Error() string {
-	return fmt.Sprintf("hasher %s has already registered", err.hasherName)
-}
-
-// ErrHashNotFound indicated a hash function can not found in hashes
-type ErrHasherNotFound struct {
-	hasherName string
-}
-
-// Error output error message
-func (err *ErrHasherNotFound) Error() string {
-	return fmt.Sprintf("hasher %s not found", err.hasherName)
-}
+	// ErrHasherAlreadyRegistered is returned when hasher already registered
+	ErrHasherAlreadyRegistered = errors.New("hasher already registered")
+)

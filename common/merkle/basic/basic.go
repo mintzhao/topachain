@@ -37,7 +37,7 @@ func (err *ErrInvalidValueType) Error() string {
 // Any type which implements the interface can stored in the MerkleTree
 type Value interface {
 	Hash() ([]byte, error)
-	Equals(other Value) bool
+	Equals(other interface{}) bool
 }
 
 type node struct {

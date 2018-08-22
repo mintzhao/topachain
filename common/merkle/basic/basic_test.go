@@ -30,7 +30,7 @@ func (tv testvalue) Hash() ([]byte, error) {
 	return h.Sum(nil), nil
 }
 
-func (tv testvalue) Equals(other Value) bool {
+func (tv testvalue) Equals(other interface{}) bool {
 	return bytes.Equal(tv, other.(testvalue))
 }
 

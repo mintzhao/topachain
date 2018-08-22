@@ -1,11 +1,17 @@
 # logging section
 logging:
 
-# crypto section
-crypto:
+common:
+  # crypto section
+  crypto:
+    # hash
+    hash: SHA256
+    # sign
+    sign: ECDSA
 
-  # hash
-  hash: SHA256
+  # database section
+  database:
+    type: badger
 
-  # sign
-  sign: ECDSA
+    badger:
+      dir: /var/topa/data

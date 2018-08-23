@@ -31,6 +31,9 @@ type Database interface {
 	// NewBatch returns a Batch interface to handle multi key/value pairs writes.
 	NewBatch() (Batch, error)
 
+	// NewIterator iterate over a key prefix
+	NewIterator(bucket, prefix string) (Iterator, error)
+
 	// Close close database
 	Close() error
 }
@@ -48,6 +51,27 @@ type Batch interface {
 
 	// Release release the resources hold by Batch
 	Release() error
+}
+
+// Iterator seek key by prefix
+type Iterator interface {
+	// HasNext return true if iterator isn't over, otherwise false
+	HasNext() bool
+
+	// Value return matched key/value pair
+	Value() (*KeyValePair, error)
+
+	// Next move pointer to next matched value
+	Next() error
+
+	// Close close iterator
+	Close() error
+}
+
+// KeyValuePair
+type KeyValePair struct {
+	Bucket, Key string
+	Value       []byte
 }
 
 var (

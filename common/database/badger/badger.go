@@ -15,14 +15,11 @@ package badger
 import (
 	"bytes"
 	"context"
-	"path/filepath"
 	"time"
 
 	"github.com/dgraph-io/badger"
-	"github.com/mintzhao/topachain/common"
 	"github.com/mintzhao/topachain/common/database"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -35,10 +32,9 @@ type BadgerDB struct {
 	cancel context.CancelFunc
 }
 
-func New() (database.Database, error) {
+func New(dir string) (database.Database, error) {
 	opts := badger.DefaultOptions
 
-	dir := getDatabaseDir()
 	opts.Dir = dir
 	opts.ValueDir = dir
 	db, err := badger.Open(opts)
@@ -79,7 +75,7 @@ func (db *BadgerDB) Get(bucket, key string) ([]byte, error) {
 		if err != nil {
 			return err
 		}
-		copy(getBytes, buf)
+		getBytes = bytes.NewBuffer(buf).Bytes()
 
 		return nil
 	}); err != nil {
@@ -110,6 +106,22 @@ func (db *BadgerDB) NewBatch() (database.Batch, error) {
 	}, nil
 }
 
+// NewIterator iterate over a key prefix
+func (db *BadgerDB) NewIterator(bucket, prefix string) (database.Iterator, error) {
+	opts := badger.DefaultIteratorOptions
+	txn := db.db.NewTransaction(false)
+	it := txn.NewIterator(opts)
+
+	prefixBytes := constructCompositeKey(bucket, prefix)
+	it.Seek(prefixBytes)
+
+	return &badgerIterator{
+		txn:    txn,
+		it:     it,
+		prefix: prefixBytes,
+	}, nil
+}
+
 // Close close database
 func (db *BadgerDB) Close() error {
 	db.cancel()
@@ -135,15 +147,6 @@ func (db *BadgerDB) gc() {
 			return
 		}
 	}
-}
-
-func getDatabaseDir() string {
-	dir := viper.GetString("common.database.badger.dir")
-	if dir == "" {
-		dir = filepath.Join(common.BASEDIR, "data")
-	}
-
-	return dir
 }
 
 func constructCompositeKey(bucket string, key string) []byte {

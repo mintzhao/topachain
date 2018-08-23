@@ -21,21 +21,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBadgerDB_Open(t *testing.T) {
-	assert.NoError(t, os.MkdirAll("./testdata", os.ModeDir))
-	defer assert.NoError(t, os.RemoveAll("./testdata"))
+var testdbdir = "./testdata"
 
-	db, err := New("./testdata")
+func TestBadgerDB_Open(t *testing.T) {
+	os.Mkdir(testdbdir, os.ModePerm)
+	defer os.RemoveAll(testdbdir)
+
+	db, err := New(testdbdir)
 	assert.NoError(t, err)
 	assert.NoError(t, db.Open())
 	db.Close()
 }
 
 func TestBadgerDB_Get(t *testing.T) {
-	assert.NoError(t, os.MkdirAll("./testdata", os.ModeDir))
-	defer assert.NoError(t, os.RemoveAll("./testdata"))
+	os.Mkdir(testdbdir, os.ModePerm)
+	defer os.RemoveAll(testdbdir)
 
-	db, err := New("./testdata")
+	db, err := New(testdbdir)
 	assert.NoError(t, err)
 	assert.NoError(t, db.Open())
 
@@ -51,10 +53,10 @@ func TestBadgerDB_Get(t *testing.T) {
 }
 
 func TestBadgerDB_Set(t *testing.T) {
-	assert.NoError(t, os.MkdirAll("./testdata", os.ModeDir))
-	defer assert.NoError(t, os.RemoveAll("./testdata"))
+	os.Mkdir(testdbdir, os.ModePerm)
+	defer os.RemoveAll(testdbdir)
 
-	db, err := New("./testdata")
+	db, err := New(testdbdir)
 	assert.NoError(t, err)
 	assert.NoError(t, db.Open())
 
@@ -67,10 +69,10 @@ func TestBadgerDB_Set(t *testing.T) {
 }
 
 func TestBadgerDB_Delete(t *testing.T) {
-	assert.NoError(t, os.MkdirAll("./testdata", os.ModeDir))
-	defer assert.NoError(t, os.RemoveAll("./testdata"))
+	os.Mkdir(testdbdir, os.ModePerm)
+	defer os.RemoveAll(testdbdir)
 
-	db, err := New("./testdata")
+	db, err := New(testdbdir)
 	assert.NoError(t, err)
 	assert.NoError(t, db.Open())
 
@@ -87,10 +89,10 @@ func TestBadgerDB_Delete(t *testing.T) {
 }
 
 func TestBadgerDB_Close(t *testing.T) {
-	assert.NoError(t, os.MkdirAll("./testdata", os.ModeDir))
-	defer assert.NoError(t, os.RemoveAll("./testdata"))
+	os.Mkdir(testdbdir, os.ModePerm)
+	defer os.RemoveAll(testdbdir)
 
-	db, err := New("./testdata")
+	db, err := New(testdbdir)
 	assert.NoError(t, err)
 	assert.NoError(t, db.Open())
 
@@ -98,10 +100,10 @@ func TestBadgerDB_Close(t *testing.T) {
 }
 
 func TestBadgerDB_Batch(t *testing.T) {
-	assert.NoError(t, os.MkdirAll("./testdata", os.ModeDir))
-	defer assert.NoError(t, os.RemoveAll("./testdata"))
+	os.Mkdir(testdbdir, os.ModePerm)
+	defer os.RemoveAll(testdbdir)
 
-	db, err := New("./testdata")
+	db, err := New(testdbdir)
 	assert.NoError(t, err)
 	assert.NoError(t, db.Open())
 
@@ -128,10 +130,10 @@ func TestBadgerDB_Batch(t *testing.T) {
 }
 
 func TestBadgerDB_Iterator(t *testing.T) {
-	assert.NoError(t, os.MkdirAll("./testdata", os.ModeDir))
-	defer assert.NoError(t, os.RemoveAll("./testdata"))
+	os.Mkdir(testdbdir, os.ModePerm)
+	defer os.RemoveAll(testdbdir)
 
-	db, err := New("./testdata")
+	db, err := New(testdbdir)
 	assert.NoError(t, err)
 	assert.NoError(t, db.Open())
 

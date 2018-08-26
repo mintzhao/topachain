@@ -52,7 +52,7 @@ MARCH=$(shell go env GOOS)-$(shell go env GOARCH)
 METADATA_VAR = Version=$(PROJECT_VERSION)
 
 GOBIN=$(abspath $(GOPATH)/bin)
-GO_LDFLAGS = $(patsubst %,-X $(PKGNAME)/cmd/version.%,$(METADATA_VAR))
+GO_LDFLAGS = $(patsubst %,-X $(PKGNAME)/cmd/root.%,$(METADATA_VAR))
 CGO_FLAGS = CGO_CFLAGS=" "
 
 GO_TAGS ?=

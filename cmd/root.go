@@ -15,6 +15,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/op/go-logging"
@@ -31,6 +32,12 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// Do Stuff Here
 	},
+	Version: func() string {
+		v := fmt.Sprintf(": %s\n", Version)
+		v += fmt.Sprintf("go   version : %s_%s_%s", runtime.Version(), runtime.GOOS, runtime.GOARCH)
+
+		return v
+	}(),
 }
 
 func Execute() {
@@ -42,6 +49,7 @@ func Execute() {
 
 var (
 	cfgFile string
+	Version string
 )
 
 func init() {

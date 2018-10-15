@@ -52,7 +52,7 @@ MARCH=$(shell go env GOOS)-$(shell go env GOARCH)
 METADATA_VAR = Version=$(PROJECT_VERSION)
 
 GOBIN=$(abspath $(GOPATH)/bin)
-GO_LDFLAGS = $(patsubst %,-X $(PKGNAME)/cmd/root.%,$(METADATA_VAR))
+GO_LDFLAGS = $(patsubst %,-X $(PKGNAME)/cmd.%,$(METADATA_VAR))
 CGO_FLAGS = CGO_CFLAGS=" "
 
 GO_TAGS ?=
@@ -95,11 +95,14 @@ unit-test:
 unit-bench:
 	go test -tags "$(GO_TAGS)" -ldflags "$(GO_LDFLAGS)" -failfast -benchmem -bench=. ./...
 
-build/bin/topa: $(PROJECT_FILES)
+build/bin/topa: $(PROJECT_FILES) clean-build
 	@mkdir -p $(@D)
 	@echo "$@"
 	$(CGO_FLAGS) go build -o $(@) -tags "$(GO_TAGS)" -ldflags "$(GO_LDFLAGS)" $(pkgmap.$(@F))
 	@echo "Binary available as $@"
+
+protos:
+	@scripts/compile_protos.sh
 
 dep.tools.%:
 	$(eval TOOL = ${subst dep.tools.,,${@}})
@@ -118,3 +121,6 @@ linter: dep.tools.golint
 .PHONY: changelog
 changelog:
 	@scripts/changelog.sh v$(PREV_VERSION) v$(BASE_VERSION)
+
+clean-build:
+	@rm -rf build

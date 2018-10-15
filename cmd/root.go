@@ -25,16 +25,13 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "topa",
-	Short: "ToPa IS a Blockchain framework for developers to Learn Blockchain",
-	Long: `A Fast and Flexible Static Site Generator built with
-                love by spf13 and friends in Go.
-                Complete documentation is available at http://hugo.spf13.com`,
+	Short: "Another Enterprise-Level Consortium Blackchain",
+	Long:  `Topa is Another Enterprise-Level Consortium Blackchain.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Do Stuff Here
+		cmd.Help()
 	},
 	Version: func() string {
-		v := fmt.Sprintf(": %s\n", Version)
-		v += fmt.Sprintf("go   version : %s_%s_%s", runtime.Version(), runtime.GOOS, runtime.GOARCH)
+		v := fmt.Sprintf("%s, powered by %s_%s_%s", Version, runtime.Version(), runtime.GOOS, runtime.GOARCH)
 
 		return v
 	}(),
@@ -53,17 +50,8 @@ var (
 )
 
 func init() {
-	cobra.OnInitialize(initConfig, initLog)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.topa.yaml)")
-	//rootCmd.PersistentFlags().StringVarP(&projectBase, "projectbase", "b", "", "base project directory eg. github.com/spf13/")
-	//rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "Author name for copyright attribution")
-	//rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "Name of license for the project (can provide `licensetext` in config)")
-	//rootCmd.PersistentFlags().Bool("viper", true, "Use Viper for configuration")
-	//viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
-	//viper.BindPFlag("projectbase", rootCmd.PersistentFlags().Lookup("projectbase"))
-	//viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
-	//viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
-	//viper.SetDefault("license", "apache")
+	cobra.OnInitialize(initLog)
+	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.topa.yaml)")
 }
 
 func initConfig() {
@@ -79,7 +67,7 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".cobra" (without extension).
+		// Search config in home directory with name ".topa" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".topa")
 	}
@@ -96,17 +84,10 @@ func initConfig() {
 }
 
 var (
-	logger    = logging.MustGetLogger("main")
-	backend   = logging.NewLogBackend(os.Stderr, "", 0)
-	formatter = logging.MustStringFormatter(`%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`)
+	logger = logging.MustGetLogger("cmd")
 )
 
 func initLog() {
-	logging.SetFormatter(formatter)
-	logging.SetBackend(backend)
-
-	// set modules logging level
-	logging.SetLevel(logging.INFO, "")
 	loggings := viper.GetStringMap("logging")
 	for module, levelInterface := range loggings {
 		levelstring, ok := levelInterface.(string)

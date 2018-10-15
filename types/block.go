@@ -12,11 +12,16 @@
 // limitations under the License.
 package types
 
-import "encoding/gob"
+import (
+	"github.com/gogo/protobuf/proto"
+	"github.com/mintzhao/topachain/common/crypto"
+)
 
-type Block struct {
-}
+func (b *BlockTxs) Hash(hash string) ([]byte, error) {
+	bbytes, err := proto.Marshal(b)
+	if err != nil {
+		return nil, err
+	}
 
-func init() {
-	gob.Register(Block{})
+	return crypto.Hash(bbytes, hash)
 }

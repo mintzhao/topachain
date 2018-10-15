@@ -13,35 +13,17 @@
 package types
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
 )
 
-// AppMetadata
-type AppMetadata struct {
-	Name    string
-	Version *AppVersion
-}
-
-// AppConfig
-type AppConfig struct {
-	MasterAddress string // blockchain master node address
-}
-
 // Software versioning: https://en.wikipedia.org/wiki/Software_versioning
-
 var (
 	ErrEmptyVersion = errors.New("empty version string")
 )
 
-// version
-type version struct {
-	major, minor, build string
-}
-
-func newVersion(ver string) (*version, error) {
+func newVersion(ver string) (*Version, error) {
 	ver = strings.TrimSpace(ver)
 	if ver == "" {
 		return nil, ErrEmptyVersion
@@ -59,21 +41,16 @@ func newVersion(ver string) (*version, error) {
 		build = vslice[2]
 	}
 
-	return &version{
-		major: major,
-		minor: minor,
-		build: build,
+	return &Version{
+		Major: major,
+		Minor: minor,
+		Build: build,
 	}, nil
-}
-
-// String format output
-func (v *version) String() string {
-	return fmt.Sprintf("%s.%s.%s", v.major, v.minor, v.build)
 }
 
 // Compare returns an integer comparing two versions lexicographically.
 // The result will be 0 if v==other, -1 if v < other, and +1 if v > other.
-func (v *version) compare(other *version) int {
+func (v *Version) compare(other *Version) int {
 	if v == nil {
 		return -1
 	}
@@ -82,27 +59,27 @@ func (v *version) compare(other *version) int {
 		return 1
 	}
 
-	if v.major > other.major {
+	if v.GetMajor() > other.GetMajor() {
 		return 1
 	}
 
-	if v.major < other.major {
+	if v.GetMajor() < other.GetMajor() {
 		return -1
 	}
 
-	if v.minor > other.minor {
+	if v.GetMinor() > other.GetMinor() {
 		return 1
 	}
 
-	if v.minor < other.minor {
+	if v.GetMinor() < other.GetMinor() {
 		return -1
 	}
 
-	if v.build > other.build {
+	if v.GetBuild() > other.GetBuild() {
 		return 1
 	}
 
-	if v.build < other.build {
+	if v.GetBuild() < other.GetBuild() {
 		return -1
 	}
 
@@ -110,18 +87,8 @@ func (v *version) compare(other *version) int {
 }
 
 // Equal check whether two version at same stage.
-func (v *version) equal(other *version) bool {
+func (v *Version) equal(other *Version) bool {
 	return v.compare(other) == 0
-}
-
-// AppVersion
-// Features:
-// 1. upgrade version value must larger than current version
-// 2. newest application can compatible a specific version of application,
-//    older version than Backwards shouldn't be used in the blockchain network.
-type AppVersion struct {
-	Version   *version
-	Backwards *version // Backwards Compatibility
 }
 
 // NewAppVersion construct app version by version format output string
@@ -153,9 +120,4 @@ func (av *AppVersion) Compatible(other *AppVersion) bool {
 	}
 
 	return av.Version.compare(other.Backwards) >= 0
-}
-
-// String format av string output
-func (av *AppVersion) String() string {
-	return fmt.Sprintf("^%s/%s", av.Backwards, av.Version)
 }

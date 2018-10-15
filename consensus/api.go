@@ -10,33 +10,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package types
+package consensus
 
 import (
-	"bytes"
-	"encoding/gob"
-
-	"github.com/mintzhao/topachain/common/crypto"
+	"github.com/mintzhao/topachain/types"
+	"golang.org/x/net/context"
 )
 
-// Transaction
-type Transaction struct {
-	Payload []byte // The data came from Blockchain Application, it's transparent to the ToPa Chain.
+type consensusapi struct {
 }
 
-func (tx *Transaction) Hash() ([]byte, error) {
-	return crypto.Hash(tx.Payload)
+func (api *consensusapi) Register(context.Context, *types.Empty) (*types.Empty, error) {
+	return nil, nil
 }
 
-func (tx *Transaction) Equals(other interface{}) bool {
-	othertx, ok := other.(*Transaction)
-	if !ok {
-		return false
-	}
-
-	return bytes.Equal(tx.Payload, othertx.Payload)
-}
-
-func init() {
-	gob.Register(Transaction{})
+func (api *consensusapi) AppStream(types.Application_AppStreamServer) error {
+	return nil
 }

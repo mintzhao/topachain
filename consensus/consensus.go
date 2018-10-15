@@ -12,6 +12,8 @@
 // limitations under the License.
 package consensus
 
-// Consensus
-type Consensus interface {
+// ConsensusHandler
+type ConsensusCore interface {
+	//
+	ReceiveTx(tx []byte)
 }

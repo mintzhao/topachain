@@ -12,7 +12,13 @@
 // limitations under the License.
 package application
 
-import "github.com/mintzhao/topachain/types"
+import (
+	"context"
+	"time"
+
+	"github.com/mintzhao/topachain/common/comm"
+	"github.com/mintzhao/topachain/types"
+)
 
 // Application
 type Application interface {
@@ -25,12 +31,30 @@ type Application interface {
 
 // Run start the app, connecting with blockchain and hold
 func Run(app Application) error {
-	//cfg := app.Config()
-	//
-	//conn, err := net.Dial("tcp", cfg.MasterAddress)
-	//if err != nil {
-	//	return err
-	//}
+	cfg := app.Config()
+
+	conn, err := comm.NewgRPCClient(cfg.MasterAddress)
+	if err != nil {
+		return err
+	}
+	appCli := types.NewApplicationClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	if _, err := appCli.Ping(ctx, &types.Empty{}); err != nil {
+		return err
+	}
+
+	stream, err := appCli.Stream(context.Background())
+	if err != nil {
+		return err
+	}
+
+	for {
+		stream.Recv()
+
+	}
 
 	return nil
 }

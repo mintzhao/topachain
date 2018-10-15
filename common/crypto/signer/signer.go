@@ -17,6 +17,7 @@ import (
 	"strings"
 	"sync"
 
+	_ "github.com/mintzhao/topachain/common/logging"
 	"github.com/op/go-logging"
 	"github.com/pkg/errors"
 )
@@ -55,7 +56,7 @@ func RegisterSigner(signerName string, s Signer) error {
 		return ErrSignerAlreadyRegistered
 	}
 
-	logger.Infof("signer %s registered", signerName)
+	logger.Debugf("signer %s registered", signerName)
 	return nil
 }
 

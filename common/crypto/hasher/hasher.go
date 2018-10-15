@@ -17,6 +17,7 @@ import (
 	"strings"
 	"sync"
 
+	_ "github.com/mintzhao/topachain/common/logging"
 	"github.com/op/go-logging"
 	"github.com/pkg/errors"
 )
@@ -58,7 +59,7 @@ func RegisterHasher(hasherName string, hasher Hasher) error {
 		return ErrHasherAlreadyRegistered
 	}
 
-	logger.Infof("hasher %s registered", hasherName)
+	logger.Debugf("hasher %s registered", hasherName)
 	return nil
 }
 

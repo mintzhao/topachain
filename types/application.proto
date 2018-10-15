@@ -1,0 +1,68 @@
+// Copyright © 2018 Zhao Ming <mint.zhao.chiu@gmail.com>.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+syntax = "proto3";
+
+import "common.proto";
+option go_package = "github.com/mintzhao/topachain/types";
+
+package types;
+
+// Application
+service Application {
+    // Register is used to register application to consensus module
+    rpc Register (Empty) returns (Empty) {}
+
+    // AppStream used for sending and receiving messages between application & consensus module
+    rpc AppStream(stream AppMessage) returns (stream AppMessage) {}
+}
+
+// AppMessage
+message AppMessage {
+    AppMessageHeader header = 1;
+    bytes payload = 2;
+}
+
+// AppMessageType
+enum AppMessageType {
+    UNKNOWN = 0;
+}
+
+// AppMessageHeader
+message AppMessageHeader {
+    AppMetadata meta = 1;
+    int64 timestamp = 2;
+    AppMessageType type = 3;
+}
+
+// AppMetadata
+message AppMetadata {
+    string name = 1;
+    AppVersion version = 2;
+}
+
+// Version
+message Version {
+    string major = 1;
+    string minor = 2;
+    string build = 3;
+}
+
+// Application version
+// Features:
+// 1. upgrade version value must larger than current version
+// 2. newest application can compatible a specific version of application,
+//    older version than Backwards shouldn't be used in the blockchain network.
+message AppVersion {
+    Version version = 1;
+    Version backwards = 2;
+}

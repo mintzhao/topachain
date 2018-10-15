@@ -18,6 +18,7 @@ import (
 
 	"github.com/mintzhao/topachain/common/crypto/hasher"
 	"github.com/mintzhao/topachain/common/crypto/signer"
+	_ "github.com/mintzhao/topachain/common/logging"
 	"github.com/op/go-logging"
 	"github.com/spf13/viper"
 )

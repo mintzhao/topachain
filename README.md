@@ -4,4 +4,4 @@
 [![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/mintzhao/topachain/blob/master/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/mintzhao/topachain/badge.svg?branch=master)](https://coveralls.io/github/mintzhao/topachain?branch=master)
 
-A Blockchain infrastructure for BEGINNERS to Learn Blockchain
+Another Enterprise-Level Consortium Blackchain.
